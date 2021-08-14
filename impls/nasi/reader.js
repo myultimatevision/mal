@@ -1,3 +1,5 @@
+const { List, Vector, HashMap, Nil, Symbol, Str }= require('./types');
+
 const tokenize = (str)=>{
   const regexp = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
     const tokens = [];
@@ -6,7 +8,7 @@ const tokenize = (str)=>{
           continue;
       tokens.push(match);
     }
-  return tokens
+  return tokens;
 }
 
 class Reader{
@@ -25,17 +27,6 @@ class Reader{
     }
 }
 
-const read_symbol = (token)=>{
-    const symbols = {
-        '+': 'plus',
-        '-': 'minus',
-        '*': 'asterik',
-        '/': 'by',
-        '%': 'modulous',
-    }
-    return symbols[token[0]]
-}
-
 const read_atom = (token)=>{
     if(token.match(/^-?[0-9]+$/)){
         return parseInt(token);
@@ -43,31 +34,67 @@ const read_atom = (token)=>{
     if(token.match(/^-?[0-9]+\.[0-9]+$/)){
         return parseFloat(token);
     }
-    return token;
+    if(token === "true"){
+        return true;
+    }
+    if(token === "false"){
+        return false;
+    }
+    if(token === "nil"){
+        return new Nil();
+    }
+    if(token.startsWith('"')){
+        if(!/[^\\]"$/.test(token))
+            throw "unbalanced";
+        return new Str(token.substring(1,token.length - 1));
+    }
+    return new Symbol(token);
 }
 
+const read_seq = (reader, closing)=>{
+    const ast = [];
+    let token;
+    while((token = reader.peek()) !== closing){
+        if(!token){
+            throw 'unbalanced';
+        }
+        ast.push(read_form(reader));
+    }
+    reader.next();
+    return ast;
+}
 
 const read_list = (reader)=>{
-    const ast = []
-    let token;
-    while((token = reader.peek()) !== ')'){
-        if(!token){
-            throw 'unbalanced'
-        }
-        ast.push(read_form(reader))
-    }
-    reader.next()
-    return ast
+    const list = read_seq(reader,')');
+    return new List(list);
+}
+
+const read_vector = (reader)=>{
+    const vector = read_seq(reader,']');
+    return new Vector(vector);
+}
+
+const read_hashmap = (reader)=>{
+    const hashMap = read_seq(reader,'}');
+    return new HashMap(hashMap);
 }
 
 const read_form = (reader)=>{
-    const token = reader.peek()
+    const token = reader.peek();
     switch(token[0]){
         case '(' :
-            reader.next()
-            return read_list(reader)
+            reader.next();
+            return read_list(reader);
+        case '[' :
+            reader.next();
+            return read_vector(reader);
+        case '{' :
+            reader.next();
+            return read_hashmap(reader);
+        case ')'|']'| '}' :
+            throw "unexpected";
     }
-    reader.next()
+    reader.next();
     return read_atom(token);
 }
 
