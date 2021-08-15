@@ -6,6 +6,10 @@ class List {
     toString(){
         return "(" + this.ast.map(e => e.toString()).join(' ') + ")";
     }
+
+    isEmpty(){
+        return this.ast.length === 0
+    }
 }
 
 class Vector {
@@ -16,15 +20,34 @@ class Vector {
     toString(){
         return "[" + this.ast.map(e => e.toString()).join(' ') + "]";
     }
+
+    isEmpty(){
+        return this.ast.length === 0
+    }
 }
 
 class HashMap {
     constructor(ast){
-        this.ast = ast;
+        this.hashmap = new Map()
+        for(let i = 0; i < ast.length; i += 2){
+            this.hashmap.set(ast[i], ast[i+1]);
+        }
     }
 
     toString(){
-        return "{" + this.ast.map(e => e.toString()).join(' ') + "}";
+        let str = "";
+        let seperator = "";
+        for(let [key, value] of this.hashmap.entries()){
+            str += seperator + key.toString();
+            str += " ";
+            str += value.toString()
+            seperator = " "
+        }
+        return "{" + str + "}";
+    }
+
+    isEmpty(){
+        return this.ast.size === 0
     }
 }
 
@@ -54,4 +77,14 @@ class Str {
    }
 }
 
-module.exports = { List, Vector, HashMap, Nil ,Symbol, Str }
+class Keyword {
+    constructor(keyword) {
+        this.keyword = keyword;
+    }
+
+    toString(){
+        return ":" + this.keyword.toString();
+    }
+}
+
+module.exports = { List, Vector, HashMap, Nil ,Symbol, Str, Keyword }

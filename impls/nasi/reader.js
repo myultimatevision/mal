@@ -1,4 +1,4 @@
-const { List, Vector, HashMap, Nil, Symbol, Str }= require('./types');
+const { List, Vector, HashMap, Nil, Symbol, Str, Keyword }= require('./types');
 
 const tokenize = (str)=>{
   const regexp = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
@@ -44,9 +44,13 @@ const read_atom = (token)=>{
         return new Nil();
     }
     if(token.startsWith('"')){
-        if(!/[^\\]"$/.test(token))
+        if(!/[^\\]"$/.test(token)){
             throw "unbalanced";
-        return new Str(token.substring(1,token.length - 1));
+        }
+        return new Str(token.substring(1, token.length - 1));
+    }
+    if(token.startsWith(':')){
+        return new Keyword(token.slice(1))
     }
     return new Symbol(token);
 }
@@ -76,6 +80,9 @@ const read_vector = (reader)=>{
 
 const read_hashmap = (reader)=>{
     const hashMap = read_seq(reader,'}');
+    if(hashMap.length % 2 !== 0){
+        throw 'odd number of entries in map';
+    }
     return new HashMap(hashMap);
 }
 
