@@ -1,10 +1,13 @@
-const { Module } = require("module");
 const { Nil } = require("./types");
 
 class Env {
-    constructor(outer){
+    constructor(outer, bindings=[], exprs=[]){
         this.outer = outer;
         this.data = {};
+
+        for(let i=0;i<bindings.length; i++){
+            this.set(bindings[i], eval(exprs[i], this));
+        }
     }
 
     set(key, value){
@@ -17,7 +20,7 @@ class Env {
             return this;
         }
         if(!this.outer){
-            return null;
+            return new Nil();
         }
         return this.outer.find(key);
     }

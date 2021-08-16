@@ -10,6 +10,10 @@ class List {
     isEmpty(){
         return this.ast.length === 0
     }
+
+    count(){
+        return this.ast.length;
+    }
 }
 
 class Vector {
@@ -23,6 +27,10 @@ class Vector {
 
     isEmpty(){
         return this.ast.length === 0
+    }
+
+    count(){
+        return this.ast.length;
     }
 }
 
@@ -47,7 +55,11 @@ class HashMap {
     }
 
     isEmpty(){
-        return this.ast.size === 0
+        return this.hashmap.size === 0
+    }
+
+    count(){
+        return this.hashmap.size;
     }
 }
 
@@ -87,4 +99,18 @@ class Keyword {
     }
 }
 
-module.exports = { List, Vector, HashMap, Nil ,Symbol, Str, Keyword }
+class Fn {
+    constructor(fn){
+        this.fn = fn;
+    }
+
+    apply(args){
+        return this.fn.apply(null,args);
+    }
+
+    toString(){
+        return '#<function>';
+    }
+}
+
+module.exports = { List, Vector, HashMap, Nil ,Symbol, Str, Keyword, Fn }
