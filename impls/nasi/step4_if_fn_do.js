@@ -61,7 +61,7 @@ const eval = (ast, env)=>{
             const args = ast.ast[1].ast;
             const fnBody = ast.ast[2];
             return new Fn((...fnArgs)=>{
-                const fnEnv = new Env(env, args, fnArgs);
+                const fnEnv = Env.create(env, args, fnArgs);
                 return eval(fnBody, fnEnv)
             });
         case 'do':

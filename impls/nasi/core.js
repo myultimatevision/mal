@@ -18,12 +18,12 @@ core.set(new Symbol('prn'), new Fn((...ast) =>{
     console.log(ast.map(e => pr_str(e, true)).join(' '));
     return new Nil();
 }));
-core.set(new Symbol('list'), new Fn((...ast) => new List(ast || [])));
+core.set(new Symbol('list'), new Fn((...ast) => new List(ast)));
 core.set(new Symbol('list?'), new Fn((ast) =>ast instanceof List));
 core.set(new Symbol('empty?'), new Fn((ast) =>ast.isEmpty()));
 core.set(new Symbol('count'), new Fn((ast) =>ast.count()));
 core.set(new Symbol('pr-str'), new Fn((...ast) =>{
-    console.log(ast.map(e => pr_str(e, true)).join(' '));
+    return new Str(ast.map(e => pr_str(e, true)).join(' '));
 }));
 core.set(new Symbol('str'), new Fn((...ast) =>{
     return new Str(ast.map(e => pr_str(e, false)).join(''));

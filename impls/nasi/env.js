@@ -1,17 +1,9 @@
-const { Nil } = require("./types");
+const { Nil, List } = require("./types");
 
 class Env {
-    constructor(outer, binds = [], exprs = []){
+    constructor(outer){
         this.outer = outer;
         this.data = {};
-
-        for(let i=0;i<binds.length; i++){
-            if(binds[i] instanceof Symbol && binds[i].symbol === '&') {
-                this.set(binds[i + 1], new List(exprs.slice(i)));
-                break;
-              }
-            this.set(binds[i], eval(exprs[i], this));
-        }
     }
 
     set(key, value){
@@ -36,6 +28,22 @@ class Env {
             throw `${symbol} not found`;
         }
         return env.data[symbol];
+    }
+
+    static create(outer, binds = [], exprs = []){
+        const newEnv = new Env(outer);
+        for(let i=0;i<binds.length; i++){
+            if(binds[i].symbol === '&') {
+                newEnv.set(binds[i + 1], new List(exprs.slice(i)))
+                break;
+              }
+
+              if(exprs[i] === undefined){
+                throw 'unbalanced';
+            }
+              newEnv.set(binds[i], exprs[i]);
+        }
+        return newEnv;
     }
 
 }

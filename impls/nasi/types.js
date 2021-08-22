@@ -1,11 +1,11 @@
 const areEqual = (a, b)=>{
-    if(a instanceof Value){
+    if(a instanceof MalValue){
         return a.equals(b);
     }
     return a === b;
 }
 
-class Value {
+class MalValue {
     toString(_, readably){
         return this.toString(_, readably);
     }
@@ -16,7 +16,7 @@ class Value {
 
 }
 
-class List extends Value {
+class List extends MalValue {
     constructor(ast){
         super();
         this.ast = ast;
@@ -43,7 +43,7 @@ class List extends Value {
     }
 }
 
-class Vector extends Value {
+class Vector extends MalValue {
     constructor(ast){
         super();
         this.ast = ast;
@@ -70,7 +70,7 @@ class Vector extends Value {
     }
 }
 
-class HashMap extends Value {
+class HashMap extends MalValue {
     constructor(ast){
         super();
         this.hashmap = new Map()
@@ -115,7 +115,7 @@ class HashMap extends Value {
     }
 }
 
-class Nil extends Value {
+class Nil extends MalValue {
     constructor(){
         super();
     }
@@ -133,7 +133,7 @@ class Nil extends Value {
     }
 }
 
-class Symbol extends Value {
+class Symbol extends MalValue {
     constructor(symbol) {
         super();
         this.symbol = symbol;
@@ -148,7 +148,7 @@ class Symbol extends Value {
     }
 }
 
-class Str extends Value {
+class Str extends MalValue {
    constructor(str) {
        super();
        this.str = str;
@@ -170,7 +170,7 @@ class Str extends Value {
 }
 }
 
-class Keyword extends Value {
+class Keyword extends MalValue {
     constructor(keyword) {
         super();
         this.keyword = keyword;
@@ -185,7 +185,7 @@ class Keyword extends Value {
     }
 }
 
-class Fn extends Value {
+class Fn extends MalValue {
     constructor(fn){
         super();
         this.fn = fn;
