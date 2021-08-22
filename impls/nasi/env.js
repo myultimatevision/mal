@@ -1,12 +1,16 @@
 const { Nil } = require("./types");
 
 class Env {
-    constructor(outer, bindings=[], exprs=[]){
+    constructor(outer, binds = [], exprs = []){
         this.outer = outer;
         this.data = {};
 
-        for(let i=0;i<bindings.length; i++){
-            this.set(bindings[i], eval(exprs[i], this));
+        for(let i=0;i<binds.length; i++){
+            if(binds[i] instanceof Symbol && binds[i].symbol === '&') {
+                this.set(binds[i + 1], new List(exprs.slice(i)));
+                break;
+              }
+            this.set(binds[i], eval(exprs[i], this));
         }
     }
 
@@ -20,7 +24,7 @@ class Env {
             return this;
         }
         if(!this.outer){
-            return new Nil();
+            return null;
         }
         return this.outer.find(key);
     }
@@ -28,12 +32,11 @@ class Env {
     get(key){
         const symbol = key.symbol;
         const env = this.find(symbol);
-        if(!env){
+        if(!(env instanceof Env)){
             throw `${symbol} not found`;
         }
         return env.data[symbol];
     }
-
 
 }
 module.exports = { Env };

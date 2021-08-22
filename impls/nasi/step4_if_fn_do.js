@@ -78,13 +78,16 @@ const eval = (ast, env)=>{
         default : 
             const seq = eval_ast(ast, env);
             const fn = seq.ast[0];
-            return fn.apply(seq.ast.slice(1))    
+            if(fn instanceof Fn){
+                return fn.apply(seq.ast.slice(1))    
+            }
+            return seq;
     }
     
 }
 const env = new Env(core);
 
-const print = (ast)=>pr_str(ast);
+const print = (ast)=>pr_str(ast, true);
 
 const repl = (str, env)=>print(eval(read(str),env));
 

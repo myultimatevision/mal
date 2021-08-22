@@ -1,10 +1,29 @@
-class List {
+const areEqual = (a, b)=>{
+    if(a instanceof Value){
+        return a.equals(b);
+    }
+    return a === b;
+}
+
+class Value {
+    toString(_, readably){
+        return this.toString(_, readably);
+    }
+
+    equals(other){
+        return this === other;
+    }
+
+}
+
+class List extends Value {
     constructor(ast){
+        super();
         this.ast = ast;
     }
 
-    toString(){
-        return "(" + this.ast.map(e => e.toString()).join(' ') + ")";
+    toString(_, readably){
+        return `(${this.ast.map(e => e.toString(_, readably)).join(' ')})`;
     }
 
     isEmpty(){
@@ -14,15 +33,24 @@ class List {
     count(){
         return this.ast.length;
     }
+
+    equals(other){
+        if(!(other instanceof List || other instanceof Vector)){
+            return false;
+        }
+        const isValuesEqual = this.ast.every((value, index) => areEqual(value, other.ast[index]));
+        return this.count() === other.count() && isValuesEqual;
+    }
 }
 
-class Vector {
+class Vector extends Value {
     constructor(ast){
+        super();
         this.ast = ast;
     }
 
-    toString(){
-        return "[" + this.ast.map(e => e.toString()).join(' ') + "]";
+    toString(_, readably){
+        return `[${this.ast.map(e => e.toString(_, readably)).join(' ')}]`;
     }
 
     isEmpty(){
@@ -32,26 +60,35 @@ class Vector {
     count(){
         return this.ast.length;
     }
+
+    equals(other){
+        if(!(other instanceof List || other instanceof Vector)){
+            return false;
+        }
+        const isValuesEqual = this.ast.every((value, index) => areEqual(value, other.ast[index]));
+        return this.count() === other.count() && isValuesEqual;
+    }
 }
 
-class HashMap {
+class HashMap extends Value {
     constructor(ast){
+        super();
         this.hashmap = new Map()
         for(let i = 0; i < ast.length; i += 2){
             this.hashmap.set(ast[i], ast[i+1]);
         }
     }
 
-    toString(){
+    toString(_, readably){
         let str = "";
         let seperator = "";
         for(let [key, value] of this.hashmap.entries()){
-            str += seperator + key.toString();
+            str += seperator + key.toString(_, readably);
             str += " ";
-            str += value.toString()
+            str += value.toString(_, readably)
             seperator = " "
         }
-        return "{" + str + "}";
+        return `{${str}}`;
     }
 
     isEmpty(){
@@ -61,46 +98,96 @@ class HashMap {
     count(){
         return this.hashmap.size;
     }
+
+    equals(other){
+        if(!(other instanceof HashMap)){
+            return false;
+        }
+        const isValuesEqual = this.count() === other.count();
+        for(let [key, value] of this.hashmap.entries()){
+            if(!isValuesEqual){
+                return false;
+            }
+            const otherValue = other.hashmap.get(key);
+            isValuesEqual = areEqual(value, otherValue);
+        }
+        return isValuesEqual
+    }
 }
 
-class Nil {
+class Nil extends Value {
+    constructor(){
+        super();
+    }
+
     toString(){
         return "nil";
     }
+
+    count(){
+        return 0;
+    }
+
+    equals(other){
+        return other instanceof Nil;
+    }
 }
 
-class Symbol {
+class Symbol extends Value {
     constructor(symbol) {
+        super();
         this.symbol = symbol;
     }
 
-    toString(){
-        return this.symbol.toString();
+    toString(_, readably){
+        return this.symbol.toString(_, readably);
+    }
+
+    equals(other){
+        return other instanceof Symbol && this.symbol === other.symbol;
     }
 }
 
-class Str {
+class Str extends Value {
    constructor(str) {
+       super();
        this.str = str;
    }
 
-   toString(){
-       return '"' + this.str + '"';
+   toString(_, readably){
+    if(!readably) {
+        return this.str.toString(_, readably);
+      }
+       return `"${this.str.toString(_, readably)
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, "\\n")
+        .toString()}"`;
    }
+
+   equals(other){
+    return other instanceof Str && this.str === other.str;
+}
 }
 
-class Keyword {
+class Keyword extends Value {
     constructor(keyword) {
+        super();
         this.keyword = keyword;
     }
 
-    toString(){
-        return ":" + this.keyword.toString();
+    toString(_, readably){
+        return `:${this.keyword.toString(_, readably)}`;
+    }
+
+    equals(other){
+        return other instanceof Keyword && this.keyword === other.keyword;
     }
 }
 
-class Fn {
+class Fn extends Value {
     constructor(fn){
+        super();
         this.fn = fn;
     }
 
@@ -111,6 +198,10 @@ class Fn {
     toString(){
         return '#<function>';
     }
+
+    equals(other){
+        return other instanceof Fn && this.fn === other.fn;
+    }
 }
 
-module.exports = { List, Vector, HashMap, Nil ,Symbol, Str, Keyword, Fn }
+module.exports = { List, Vector, HashMap, Nil ,Symbol, Str, Keyword, Fn, areEqual }

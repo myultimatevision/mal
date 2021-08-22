@@ -47,7 +47,7 @@ const read_atom = (token)=>{
         if(!/[^\\]"$/.test(token)){
             throw "unbalanced";
         }
-        return new Str(token.substring(1, token.length - 1));
+        return new Str(token.slice(1, -1).replace(/\\(.)/g,(_, c) => c === "n" ? "\n" : c));
     }
     if(token.startsWith(':')){
         return new Keyword(token.slice(1))
