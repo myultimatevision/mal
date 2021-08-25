@@ -190,16 +190,44 @@ class Keyword extends MalValue {
 }
 
 class Fn extends MalValue {
-  constructor(binds, ast, env) {
+  constructor(binds, ast, env, fn) {
     super();
     this.binds = binds;
     this.ast = ast;
     this.env = env;
+    this.fn = fn;
+  }
+
+  apply(_, args){
+      return this.fn.apply(null, args);
   }
 
   toString() {
     return "#<function>";
   }
+}
+
+class Atom extends MalValue{
+    constructor(value){
+        super();
+        this.value = value;
+    }
+
+    toString(_, readably){
+        return `(atom ${this.value.toString(_, readably)})`;
+    }
+
+    equals(other){
+        if(!(other instanceof Atom)) return false;
+        return areEqual(this.value, other.value);
+    }
+
+    deref(){
+        return this.value;
+    }
+    reset(value){
+        return this.value = value;
+    }
 }
 
 module.exports = {
@@ -211,5 +239,6 @@ module.exports = {
   Str,
   Keyword,
   Fn,
+  Atom,
   areEqual,
 };

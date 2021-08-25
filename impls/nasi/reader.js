@@ -4,8 +4,9 @@ const tokenize = (str)=>{
   const regexp = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
     const tokens = [];
     while((match = regexp.exec(str)[1]) !== ''){
-      if(match[0] === ';')
+      if(match[0] === ';'){
           continue;
+      }
       tokens.push(match);
     }
   return tokens;
@@ -43,11 +44,12 @@ const read_atom = (token)=>{
     if(token === "nil"){
         return new Nil();
     }
+    if(token.match(/^"(?:\\.|[^\\"])*"$/)){
+        const str = token.slice(1, -1).replace(/\\(.)/g,(_, c) => c === "n" ? "\n" : c);
+        return new Str(str);
+    }
     if(token.startsWith('"')){
-        if(!/[^\\]"$/.test(token)){
-            throw "unbalanced";
-        }
-        return new Str(token.slice(1, -1).replace(/\\(.)/g,(_, c) => c === "n" ? "\n" : c));
+        return "unbalanced"
     }
     if(token.startsWith(':')){
         return new Keyword(token.slice(1))
@@ -86,6 +88,18 @@ const read_hashmap = (reader)=>{
     return new HashMap(hashMap);
 }
 
+const prependSymbol = (reader, newSymbol) =>{
+    const token = reader.peek(); 
+    const symbol = new Symbol(newSymbol);
+    const value = read_atom(token);
+    return new List([symbol, value])
+
+}
+
+const read_deref = (reader) =>{
+    return prependSymbol(reader, 'deref')
+}
+
 const read_form = (reader)=>{
     const token = reader.peek();
     switch(token[0]){
@@ -98,6 +112,9 @@ const read_form = (reader)=>{
         case '{' :
             reader.next();
             return read_hashmap(reader);
+            case '@' :
+                reader.next();
+                return read_deref(reader);    
         case ')'|']'| '}' :
             throw "unexpected";
     }
