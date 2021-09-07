@@ -86,12 +86,12 @@ class Vector extends MalValue {
   }
 
   cons(element){
-    return new Vector([element, ...this.ast]);
+    return new List([element, ...this.ast]);
   }
 
   concat(other){
     if(!(other instanceof List || other instanceof Vector)) throw 'Invalid type'
-    return new Vector(this.ast.concat(other.ast));
+    return new List(this.ast.concat(other.ast));
   }
 
   beginsWith(symbol){

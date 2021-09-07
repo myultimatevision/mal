@@ -117,7 +117,8 @@ const read_splice_unquote = (reader) =>{
 
 const read_form = (reader)=>{
     const token = reader.peek();
-    switch(token[0]){
+    console
+    switch(token){
         case '(' :
             reader.next();
             return read_list(reader);
@@ -129,14 +130,14 @@ const read_form = (reader)=>{
             return read_hashmap(reader);
             case '@' :
                 return read_deref(reader); 
-            case "'" :
+            case '\'' :
                 return read_quote(reader);
             case '`' :
                 return read_quasiquote(reader); 
+            case "~@" :
+                return read_splice_unquote(reader);                            
             case '~' :
                 return read_unquote(reader);
-            case '~@' :
-                return read_splice_unquote(reader);                            
         case ')'|']'| '}' :
             throw "unexpected";
     }

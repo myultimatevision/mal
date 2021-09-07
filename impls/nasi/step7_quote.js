@@ -20,12 +20,12 @@ const quasiquote = (ast) => {
         return ast;
     }
 
-    if(ast.beginsWith('unquote')){
+    if(ast instanceof List && ast.beginsWith('unquote')){
         return ast.ast[1];
     }
     
     let list = new List([]);
-    for(let i = ast.ast.length - 1; i >= 0; i--){
+    for(let i = ast.count() - 1; i >= 0; i--){
         let elt = ast.ast[i];
         if(elt instanceof List && elt.beginsWith("splice-unquote")){
             list = new List([new Symbol("concat"), elt.ast[1], list])
