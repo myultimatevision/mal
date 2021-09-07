@@ -2,7 +2,7 @@ const fs = require("fs");
 const { Env } = require("./env");
 const { pr_str } = require("./printer");
 const { read_ast } = require("./reader");
-const { Symbol, List, Str, Nil, areEqual, Atom } = require("./types");
+const { Symbol, List, Str, Nil, areEqual, Atom, Vector } = require("./types");
 
 const core = new Env(null);
 
@@ -49,24 +49,36 @@ core.set(new Symbol("slurp"), (fileName) => {
     }
   });
 
-  core.set(new Symbol("atom"), (value) => new Atom(value));
-  core.set(new Symbol("atom?"), (atom) => atom instanceof Atom);
-  core.set(new Symbol("deref"), (atom) => {
-      if(atom instanceof Atom) return atom.deref()
-      throw 'invalid type';
-    });
-    core.set(new Symbol("reset!"), (atom, value) => {
-        if(atom instanceof Atom) return atom.reset(value)
-        throw 'invalid type';
-    });
+core.set(new Symbol("atom?"), (atom) => atom instanceof Atom);
+core.set(new Symbol("atom"), (value) => new Atom(value));
+core.set(new Symbol("deref"), (atom) => {
+  if(atom instanceof Atom) return atom.deref()
+  throw 'invalid type';
+});
+core.set(new Symbol("reset!"), (atom, value) => {
+  if(atom instanceof Atom) return atom.reset(value)
+  throw 'invalid type';
+});
 
-    core.set(new Symbol("swap!"), (atom, fn, ...args) => {
-        if(atom instanceof Atom){
-            const evaluatedValue = fn.apply(null, [atom.deref(), ...args]) ;
-            return atom.reset(evaluatedValue)
-        } 
-        throw 'invalid type';
-    });
+core.set(new Symbol("swap!"), (atom, fn, ...args) => {
+  if(atom instanceof Atom){
+    const evaluatedValue = fn.apply(null, [atom.deref(), ...args]);
+    return atom.reset(evaluatedValue)
+  } 
+  throw 'invalid type';
+});
+core.set(new Symbol("cons"), (element, list) => {
+  if(!(list instanceof List || list instanceof Vector)) throw 'Invalid seq';
+  return list.cons(element);
+});
+
+core.set(new Symbol("concat"), (...lists) => {
+  return lists.reduce((newList,list)=>newList.concat(list), new List([]));
+});
     
+core.set(new Symbol("vec"), (seq) => {
+  if(!(seq instanceof List || seq instanceof Vector)) throw 'invalid type';
+  return new Vector([...seq.ast]);
+});
 
 module.exports = { core };

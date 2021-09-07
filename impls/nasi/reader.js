@@ -89,15 +89,30 @@ const read_hashmap = (reader)=>{
 }
 
 const prependSymbol = (reader, newSymbol) =>{
-    const token = reader.peek(); 
+    reader.next();
     const symbol = new Symbol(newSymbol);
-    const value = read_atom(token);
+    const value = read_form(reader);
     return new List([symbol, value])
-
 }
 
 const read_deref = (reader) =>{
     return prependSymbol(reader, 'deref')
+}
+
+const read_quote = (reader) =>{
+    return prependSymbol(reader, 'quote')
+}
+
+const read_quasiquote = (reader) =>{
+    return prependSymbol(reader, 'quasiquote')
+}
+
+const read_unquote = (reader) =>{
+    return prependSymbol(reader, 'unquote')
+}
+
+const read_splice_unquote = (reader) =>{
+    return prependSymbol(reader, 'splice-unquote')
 }
 
 const read_form = (reader)=>{
@@ -113,8 +128,15 @@ const read_form = (reader)=>{
             reader.next();
             return read_hashmap(reader);
             case '@' :
-                reader.next();
-                return read_deref(reader);    
+                return read_deref(reader); 
+            case "'" :
+                return read_quote(reader);
+            case '`' :
+                return read_quasiquote(reader); 
+            case '~' :
+                return read_unquote(reader);
+            case '~@' :
+                return read_splice_unquote(reader);                            
         case ')'|']'| '}' :
             throw "unexpected";
     }

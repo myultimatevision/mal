@@ -42,6 +42,19 @@ class List extends MalValue {
     );
     return this.count() === other.count() && isValuesEqual;
   }
+
+  cons(element){
+    return new List([element, ...this.ast]);
+  }
+
+  concat(other){
+    if(!(other instanceof List || other instanceof Vector)) throw 'Invalid type'
+    return new List(this.ast.concat(other.ast));
+  }
+
+  beginsWith(symbol){
+    return !(this.isEmpty()) && this.ast[0].symbol === symbol;
+  }
 }
 
 class Vector extends MalValue {
@@ -70,6 +83,19 @@ class Vector extends MalValue {
       areEqual(value, other.ast[index])
     );
     return this.count() === other.count() && isValuesEqual;
+  }
+
+  cons(element){
+    return new Vector([element, ...this.ast]);
+  }
+
+  concat(other){
+    if(!(other instanceof List || other instanceof Vector)) throw 'Invalid type'
+    return new Vector(this.ast.concat(other.ast));
+  }
+
+  beginsWith(symbol){
+    return !(this.isEmpty()) && this.ast[0].symbol === symbol;
   }
 }
 
