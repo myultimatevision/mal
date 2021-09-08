@@ -43,17 +43,18 @@ class List extends MalValue {
     return this.count() === other.count() && isValuesEqual;
   }
 
-  cons(element){
+  cons(element) {
     return new List([element, ...this.ast]);
   }
 
-  concat(other){
-    if(!(other instanceof List || other instanceof Vector)) throw 'Invalid type'
+  concat(other) {
+    if (!(other instanceof List || other instanceof Vector))
+      throw "Invalid type";
     return new List(this.ast.concat(other.ast));
   }
 
-  beginsWith(symbol){
-    return !(this.isEmpty()) && this.ast[0].symbol === symbol;
+  beginsWith(symbol) {
+    return !this.isEmpty() && this.ast[0].symbol === symbol;
   }
 }
 
@@ -85,17 +86,18 @@ class Vector extends MalValue {
     return this.count() === other.count() && isValuesEqual;
   }
 
-  cons(element){
+  cons(element) {
     return new List([element, ...this.ast]);
   }
 
-  concat(other){
-    if(!(other instanceof List || other instanceof Vector)) throw 'Invalid type'
+  concat(other) {
+    if (!(other instanceof List || other instanceof Vector))
+      throw "Invalid type";
     return new List(this.ast.concat(other.ast));
   }
 
-  beginsWith(symbol){
-    return !(this.isEmpty()) && this.ast[0].symbol === symbol;
+  beginsWith(symbol) {
+    return !this.isEmpty() && this.ast[0].symbol === symbol;
   }
 }
 
@@ -224,8 +226,8 @@ class Fn extends MalValue {
     this.fn = fn;
   }
 
-  apply(_, args){
-      return this.fn.apply(null, args);
+  apply(_, args) {
+    return this.fn.apply(null, args);
   }
 
   toString() {
@@ -233,27 +235,27 @@ class Fn extends MalValue {
   }
 }
 
-class Atom extends MalValue{
-    constructor(value){
-        super();
-        this.value = value;
-    }
+class Atom extends MalValue {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
 
-    toString(_, readably){
-        return `(atom ${this.value.toString(_, readably)})`;
-    }
+  toString(_, readably) {
+    return `(atom ${this.value.toString(_, readably)})`;
+  }
 
-    equals(other){
-        if(!(other instanceof Atom)) return false;
-        return areEqual(this.value, other.value);
-    }
+  equals(other) {
+    if (!(other instanceof Atom)) return false;
+    return areEqual(this.value, other.value);
+  }
 
-    deref(){
-        return this.value;
-    }
-    reset(value){
-        return this.value = value;
-    }
+  deref() {
+    return this.value;
+  }
+  reset(value) {
+    return (this.value = value);
+  }
 }
 
 module.exports = {
